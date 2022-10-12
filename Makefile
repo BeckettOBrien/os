@@ -1,7 +1,7 @@
 default: run
 .PHONY: default run build clean
 
-KERNEL_FILES = boot/multiboot boot/entry
+KERNEL_FILES = boot/multiboot boot/entry boot/paging boot/gdt
 ASMFLAGS = -f elf64
 CFLAGS = -ffreestanding
 LDFLAGS = -T linker.ld -nmagic

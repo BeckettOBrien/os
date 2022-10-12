@@ -3,8 +3,21 @@
 
 section .text
 
+extern identity_map_kernel
+extern enable_paging
+extern load_gdt
+
 global _start
 _start:
+    ; Set up page table for identity mapping
+    call identity_map_kernel
+    call enable_paging
+    ; Load GDT
+    jmp load_gdt
+
+[bits 64]
+global kernel_far_entry
+kernel_far_entry:
     ; Hello world
     mov word [0xb8000], 0x0f48 ; H
     mov word [0xb8002], 0x0f65 ; e
