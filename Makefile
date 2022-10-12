@@ -1,7 +1,7 @@
 default: run
 .PHONY: default run build clean
 
-KERNEL_FILES = boot/multiboot boot/entry boot/paging boot/gdt
+KERNEL_FILES = boot/multiboot boot/entry boot/paging boot/gdt kernel/bootstrap
 ASMFLAGS = -f elf64
 CFLAGS = -ffreestanding
 LDFLAGS = -T linker.ld -nmagic
@@ -14,6 +14,10 @@ OBJECT_FILES = $(addprefix build/,$(addsuffix .o,$(KERNEL_FILES)))
 build/%.o: %.asm
 	mkdir -p build/$(dir $^)
 	nasm $(ASMFLAGS) $^ -o $@
+
+build/%.o: %.c
+	mkdir -p build/$(dir $^)
+	gcc $(CFLAGS) -c $^ -o $@
 
 $(KERNEL_IMAGE): linker.ld $(OBJECT_FILES)
 	ld $(LDFLAGS) -o $@ $(OBJECT_FILES)
