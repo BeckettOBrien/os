@@ -1,9 +1,10 @@
 default: run
-.PHONY: default run build clean
+.PHONY: default run build clean list
 
-KERNEL_FILES = boot/multiboot boot/entry boot/paging boot/gdt kernel/bootstrap
+KERNEL_FILES = boot/multiboot boot/entry boot/paging boot/gdt $(basename $(shell find . -type f -name '*.c' | sed 's|^\./||'))
+HEADER_FILES = $(shell find . -type f -name '*.h' | sed 's|^\./||')
 ASMFLAGS = -f elf64
-CFLAGS = -ffreestanding
+CFLAGS = -ffreestanding -Iinclude -I.
 LDFLAGS = -T linker.ld -nmagic
 KERNEL_IMAGE = build/kernel.bin
 DISK_IMAGE = build/disk.iso
@@ -15,9 +16,9 @@ build/%.o: %.asm
 	mkdir -p build/$(dir $^)
 	nasm $(ASMFLAGS) $^ -o $@
 
-build/%.o: %.c
+build/%.o: %.c $(HEADER_FILES)
 	mkdir -p build/$(dir $^)
-	gcc $(CFLAGS) -c $^ -o $@
+	gcc $(CFLAGS) -c $< -o $@
 
 $(KERNEL_IMAGE): linker.ld $(OBJECT_FILES)
 	ld $(LDFLAGS) -o $@ $(OBJECT_FILES)
@@ -34,3 +35,7 @@ run: $(DISK_IMAGE)
 
 clean:
 	rm -rf build
+
+list:
+	@echo $(KERNEL_FILES)
+	@echo $(HEADER_FILES)
