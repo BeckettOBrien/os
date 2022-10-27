@@ -1,10 +1,6 @@
 #pragma once
 #include "types.h"
 
-#define VGA_ADDR 0xb8000
-#define VGA_WIDTH 80
-#define VGA_HEIGHT 25
-
 #define VGA_COLOR(fg, bg) ((bg << 4) | fg)
 // --- VGA Colors ---
 #define BLACK 0x0
@@ -32,5 +28,7 @@ typedef struct {
 
 void clear_screen(void);
 void vga_print(char* str);
+void vga_println(char* str);
 void vga_print_color(char* str, uint8_t color);
 void vga_print_at(char character, uint8_t color, uint32_t x, uint32_t y);
+void vga_scroll(void);

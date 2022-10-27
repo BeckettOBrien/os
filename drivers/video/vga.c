@@ -1,4 +1,9 @@
 #include "vga.h"
+#include "memory/memory.h"
+
+#define VGA_ADDR 0xb8000
+#define VGA_WIDTH 80
+#define VGA_HEIGHT 25
 
 VGA_CHAR* VGA_MEM = (VGA_CHAR*)VGA_ADDR;
 uint32_t VGA_CURSOR_X = 0;
@@ -9,6 +14,11 @@ void clear_screen(void) {
         VGA_MEM[i].character = ' ';
         VGA_MEM[i].color = VGA_COLOR(WHITE, BLACK);
     }
+}
+
+void vga_println(char* str) {
+    vga_print(str);
+    vga_print("\n");
 }
 
 void vga_print(char* str) {
@@ -26,6 +36,7 @@ void vga_print_color(char* str, uint8_t color) {
             i++;
             continue;
         }
+        vga_scroll();
         vga_print_at(str[i], color, VGA_CURSOR_X, VGA_CURSOR_Y);
         VGA_CURSOR_X++;
         i++;
@@ -34,6 +45,18 @@ void vga_print_color(char* str, uint8_t color) {
 
 void vga_print_at(char character, uint8_t color, uint32_t x, uint32_t y) {
     uint32_t idx = (VGA_WIDTH * y) + x;
+    if (idx > (VGA_WIDTH * VGA_HEIGHT)) return;
     VGA_MEM[idx].character = character;
     VGA_MEM[idx].color = color;
+}
+
+void vga_scroll(void) {
+    while (VGA_CURSOR_Y >= VGA_HEIGHT) {
+        for (int i = 1; i < VGA_HEIGHT; i++) {
+            void* dest = VGA_MEM + ((i-1) * VGA_WIDTH);
+            void* src = VGA_MEM + (i * VGA_WIDTH);
+            memcpy(dest, src, VGA_WIDTH * sizeof(VGA_CHAR));
+        }
+        VGA_CURSOR_Y--;
+    }
 }

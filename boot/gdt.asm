@@ -12,7 +12,7 @@
 %define GDT_DS_FLAGS (GDT_FLAG_RW | GDT_FLAG_DT | GDT_FLAG_PRESENT)
 
 section .rodata
-
+global gdt.code
 gdt:
     dq 0                        ; Zero entry
 .code: equ $ - gdt              ; Define label by offset

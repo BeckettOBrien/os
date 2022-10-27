@@ -2,7 +2,7 @@ default: run
 .PHONY: default run debug build clean
 MAKEFLAGS := --jobs=$(shell nproc)
 
-KERNEL_FILES := boot/multiboot boot/entry boot/paging boot/gdt $(basename $(shell find . -type f -name '*.c' | sed 's|^\./||'))
+KERNEL_FILES := $(basename $(shell find . -type f -name '*.asm' | sed 's|^\./||')) $(basename $(shell find . -type f -name '*.c' | sed 's|^\./||'))
 ASMFLAGS = -f elf64
 CFLAGS = -ffreestanding -Iinclude -Ilibc -I. -g -Wall -Wextra -MMD -MP
 LDFLAGS = -T linker.ld -nmagic
