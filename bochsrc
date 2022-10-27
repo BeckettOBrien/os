@@ -1,0 +1,7 @@
+display_library: x
+cpu: count=1, ips=1000000
+memory: guest=512, host=512
+romimage: file=$BXSHARE/BIOS-bochs-latest
+vgaromimage: file=$BXSHARE/VGABIOS-lgpl-latest
+ata0-master: type=cdrom, path=build/disk.iso, status=inserted
+boot: cdrom

@@ -42,5 +42,8 @@ debug: $(DISK_IMAGE) $(KERNEL_IMAGE)
 gdb: $(KERNEL_IMAGE)
 	gdb $(KERNEL_IMAGE) -ex 'target remote localhost:1234'
 
+bochs: $(DISK_IMAGE)
+	bochs
+
 clean:
 	rm -rf build
