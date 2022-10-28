@@ -28,16 +28,26 @@ void vga_print(char* str) {
 void vga_print_color(char* str, uint8_t color) {
     int i = 0;
     while (str[i] != '\0') {
-        if (str[i] == '\n' || (VGA_CURSOR_X >= VGA_WIDTH)) {
+        char c = str[i];
+        if (c == '\n' || (VGA_CURSOR_X >= VGA_WIDTH)) {
             VGA_CURSOR_Y++;
             VGA_CURSOR_X = 0;
+            vga_scroll();
         }
-        if (str[i] == '\n') {
+        if (c == '\n') {
             i++;
             continue;
         }
+        if (c == '\b') {
+            i++;
+            if ((VGA_CURSOR_X > 0)) {
+                VGA_CURSOR_X--;
+                vga_print_at(' ', color, VGA_CURSOR_X, VGA_CURSOR_Y);
+            }
+            continue;
+        }
         vga_scroll();
-        vga_print_at(str[i], color, VGA_CURSOR_X, VGA_CURSOR_Y);
+        vga_print_at(c, color, VGA_CURSOR_X, VGA_CURSOR_Y);
         VGA_CURSOR_X++;
         i++;
     }
@@ -58,5 +68,6 @@ void vga_scroll(void) {
             memcpy(dest, src, VGA_WIDTH * sizeof(VGA_CHAR));
         }
         VGA_CURSOR_Y--;
+        memset(&VGA_MEM[VGA_CURSOR_Y*VGA_WIDTH], 0, VGA_WIDTH * sizeof(VGA_CHAR));
     }
 }

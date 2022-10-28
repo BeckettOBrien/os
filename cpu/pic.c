@@ -41,3 +41,20 @@ void pic_eoi(uint8_t irq) {
     if (irq > 7) outb(PIC2_CMD, PIC_EOI); // Slave PIC (irq > 7) needs to inform both PICs
     outb(PIC1_CMD, PIC_EOI);
 }
+
+// Enable (unmask) and disable (mask) irq lines
+void pic_mask(uint8_t irq) {
+    if (irq > 15) return;
+    uint8_t pic2 = irq > 7;
+    uint16_t port = pic2 ? PIC2_DATA : PIC1_DATA;
+    uint8_t mask = inb(port);
+    outb(port, mask | (1 << (irq - (pic2 ? 8 : 0))));
+}
+
+void pic_unmask(uint8_t irq) {
+    if (irq > 15) return;
+    uint8_t pic2 = irq > 7;
+    uint16_t port = pic2 ? PIC2_DATA : PIC1_DATA;
+    uint8_t mask = inb(port);
+    outb(port, mask & ~(1 << (irq - (pic2 ? 8 : 0))));
+}

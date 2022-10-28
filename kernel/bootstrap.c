@@ -1,4 +1,5 @@
 #include "drivers/video/vga.h"
+#include "drivers/keyboard/ps2.h"
 #include "interrupts.h"
 
 void kernel_bootstrap(void) {
@@ -8,6 +9,7 @@ void kernel_bootstrap(void) {
     initialize_interrupts();
     install_exception_handlers();
     interrupt_test();
+    initialize_keyboard();
     while (1) {}
 }
 
@@ -24,7 +26,4 @@ void vga_test(void) {
 void interrupt_test(void) {
     asm volatile("int3");
     vga_println("POINT");
-    vga_print("Divide by zero test: ");
-    int t = 1 / 0;
-    vga_println("Done");
 }

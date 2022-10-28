@@ -1,6 +1,8 @@
 #pragma once
 #include "types.h"
 
+#define IRQ_IDX(irq) (32 + irq)
+
 typedef struct {
     uint64_t r11, r10, r9, r8, rdx, rcx, rax;
     uint8_t id, errno;
