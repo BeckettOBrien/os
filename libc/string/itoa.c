@@ -1,15 +1,21 @@
 #include "string.h"
 
-int digits(uint64_t val) {
+int digits(uint64_t val, int radix) {
     int out = 1;
-    while (val /= 10) out++;
+    while (val /= radix) out++;
     return out;
 }
 
-void itoa(char* buf, uint64_t val) {
-    int i = digits(val);
+void itoa(uint64_t val, char* buf, int radix) {
+    int i = digits(val, radix);
     buf[i] = '\0';
     do {
-        buf[--i] = '0' + (val % 10);
-    } while ((val /= 10) > 0);
+        int digit = (val % radix);
+        char base = '0';
+        if (digit >= 10) {
+            digit -= 10;
+            base = 'A';
+        }
+        buf[--i] = base + digit;
+    } while ((val /= radix) > 0);
 }

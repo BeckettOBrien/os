@@ -13,9 +13,9 @@ VM_DISK_PATH = vmdisk
 OBJECTS := $(addprefix build/,$(addsuffix .o,$(KERNEL_FILES)))
 DEPENDS := $(addprefix build/,$(addsuffix .d,$(KERNEL_FILES)))
 
-build/%.o: %.asm
+build/%.o: %.asm Makefile
 	@mkdir -p build/$(dir $<)
-	nasm $(ASMFLAGS) $^ -o $@
+	nasm $(ASMFLAGS) $< -o $@
 
 -include $(DEPENDS)
 
@@ -40,7 +40,7 @@ debug: $(DISK_IMAGE) $(KERNEL_IMAGE)
 	qemu-system-x86_64 -cdrom $(DISK_IMAGE) -monitor stdio -s -S
 
 gdb: $(KERNEL_IMAGE)
-	gdb $(KERNEL_IMAGE) -ex 'target remote localhost:1234'
+	gdb $(KERNEL_IMAGE) -ex 'target remote localhost:1234' -ex 'b kernel_bootstrap'
 
 bochs: $(DISK_IMAGE)
 	bochs

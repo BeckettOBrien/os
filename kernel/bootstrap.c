@@ -1,6 +1,8 @@
 #include "drivers/video/vga.h"
 #include "drivers/keyboard/ps2.h"
 #include "interrupts.h"
+#include "boot/multiboot.h"
+#include "memory/paging.h"
 
 void kernel_bootstrap(void) {
     clear_screen();
@@ -10,6 +12,7 @@ void kernel_bootstrap(void) {
     install_exception_handlers();
     interrupt_test();
     initialize_keyboard();
+    read_multiboot_info();
     while (1) {}
 }
 

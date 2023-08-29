@@ -14,9 +14,9 @@ void isr_handle(interrupt_state state) {
     if (handler) {
         handler(state);
     } else {
-        vga_print("Unhandled interrupt: ");
+        vga_print("Unhandled interrupt: 0x");
         char out[4];
-        itoa(out, state.id);
+        itoa(state.id, out, 16);
         vga_println(out);
         while (1) {}
         asm volatile("cli; hlt");

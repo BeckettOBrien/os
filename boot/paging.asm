@@ -18,17 +18,26 @@ section .bss
 align 4096
 
 ; Reserve enough memory to identity map one GiB (using 2MiB pages so no p1 table)
+global KERNEL_PAGE_TABLE
+KERNEL_PAGE_TABLE:
 p4_table:
     resb 4096
 p3_table:
     resb 4096
 p2_table:
     resb 4096
+p1_table:
+    resb 4096
 
 section .text
 
 global identity_map_kernel
 identity_map_kernel:
+    ; Recursively map the last entry of the page directory (p4) table to itself
+    mov eax, p4_table
+    or eax, (PT_FLAG_PRESENT | PT_FLAG_WRITABLE)
+    mov dword [p4_table + 511 * 8], eax
+
     ; Point first entry of page directory (p4) table to the p3 table
     mov eax, p3_table
     or eax, (PT_FLAG_PRESENT | PT_FLAG_WRITABLE)
@@ -39,18 +48,23 @@ identity_map_kernel:
     or eax, (PT_FLAG_PRESENT | PT_FLAG_WRITABLE)
     mov dword [p3_table + 0], eax ; Set index 0 in the p3 table to the address + flags
 
+    ; Point first entry of p2 table to the p1 table
+    mov eax, p1_table
+    or eax, (PT_FLAG_PRESENT | PT_FLAG_WRITABLE)
+    mov dword [p2_table + 0], eax ; Set index 0 in the p2 table to the address + flags
+
     ; Loop to fill the p2 table to point to actual pages
     mov ecx, 0 ; 512x2MiB=1GiB to fill the table
-.create_p2_maps_loop:
+.create_p1_maps_loop:
     ; Calculate the physical address of each mapping
-    mov eax, 0x200000 ; 2MiB
+    mov eax, 0x1000 ; 4 KiB | 2MiB
     mul ecx
-    or eax, (PT_FLAG_PRESENT | PT_FLAG_WRITABLE | PT_FLAG_PAGESIZE) ; 4 MiB pages
-    mov [p2_table + (ecx * 8)], eax
+    or eax, (PT_FLAG_PRESENT | PT_FLAG_WRITABLE) ; 2 MiB pages  | PT_FLAG_PAGESIZE
+    mov [p1_table + (ecx * 8)], eax
     ; Loop
     inc ecx
-    cmp ecx, 512
-    jne .create_p2_maps_loop
+    cmp ecx, 512 ;512
+    jne .create_p1_maps_loop
     ; End of loop
     ret
 

@@ -22,4 +22,6 @@ SECTIONS {
     {
         *(.bss)
     }
+
+    KERNEL_END = ALIGN(2M);
 }
