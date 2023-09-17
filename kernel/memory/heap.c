@@ -1,4 +1,6 @@
 #include "heap.h"
+#include "paging.h"
+#include "kmalloc.h"
 #include "memory/memory.h"
 #include "math/math.h"
 #include "drivers/video/vga.h"
@@ -15,11 +17,12 @@
 // TODO: make this dynamic
 uint8_t free_memory[MAX_HEAP_MEMORY/8];
 uint64_t heap_start;
+uint64_t current_mapped_heap_length;
 
 void init_heap(mem_region* memmap, int map_entries, uint64_t kernel_end) {
     find_heap_start(memmap, map_entries, kernel_end);
     fill_bitmap(memmap, map_entries, kernel_end);
-    // TODO: Set up dynamic heap allocator
+    current_mapped_heap_length = 0;
 }
 
 void find_heap_start(mem_region* memmap, int map_entries, uint64_t kernel_end) { //TODO: fix this entire approach
@@ -69,11 +72,37 @@ uint64_t allocate_page(void) {
     for (; idx < MAX_HEAP_MEMORY; idx++) {
         if ((free_memory[idx/8] >> (idx%8)) & 1) break;
     }
+    if (!((free_memory[idx/8] >> (idx%8)) & 1)) {
+        //TODO: Error propogation
+        vga_println("ERR: No more physical heap memory!");
+        panic();
+    }
     free_memory[idx/8] &= ~(1 << (idx%8));
     return heap_start + PAGES_TO_BYTES(idx);
 }
 
 void free_page(uint64_t addr) {
     int offset = BYTES_TO_PAGES(addr - heap_start);
+    if (free_memory[offset/8] &= (1 << (offset%8))) {
+        vga_println("WARNING: double free detected!");
+    }
     free_memory[offset/8] |= (1 << (offset%8));
+}
+
+// Maps an additional page as part of the kernel heap
+// Returns the current size of the heap in bytes
+uint64_t extend_heap(void) {
+    uint64_t new_page = allocate_page();
+    map_page_to_kernel(new_page, HEAP_VIRTADDR + PAGES_TO_BYTES(current_mapped_heap_length++),  WRITABLE);
+    return PAGES_TO_BYTES(current_mapped_heap_length);
+}
+
+// Removes and frees the highest page of the heap
+void shrink_heap(void) {
+    if (current_mapped_heap_length < 1) {
+        vga_println("ERR: cannot shrink heap with length zero");
+        return;
+    }
+    unmap_page_kernel(HEAP_VIRTADDR + PAGES_TO_BYTES(--current_mapped_heap_length));
+    free_page(current_mapped_heap_length);
 }

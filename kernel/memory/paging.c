@@ -3,6 +3,7 @@
 #include "../boot/multiboot.h"
 #include "string/string.h"
 #include "drivers/video/vga.h"
+#include "memory/memory.h"
 
 #define PAGE_SIZE 0x1000
 #define ALIGN_PAGE_LOWER(x) (x & ~0xFFF)

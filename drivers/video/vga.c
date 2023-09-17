@@ -1,5 +1,7 @@
 #include "vga.h"
 #include "memory/memory.h"
+#include "string/string.h"
+#include <stdarg.h>
 
 #define VGA_ADDR 0xb8000
 #define VGA_WIDTH 80
@@ -14,6 +16,15 @@ void clear_screen(void) {
         VGA_MEM[i].character = ' ';
         VGA_MEM[i].color = VGA_COLOR(WHITE, BLACK);
     }
+}
+
+void vga_printf(char* fmt, ...) {
+    va_list args;
+    va_start(args, fmt);
+    char* buf;
+    vasprintf(&buf, fmt, args);
+    vga_print(buf);
+    kfree(buf);
 }
 
 void vga_println(char* str) {

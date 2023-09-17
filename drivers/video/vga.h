@@ -27,6 +27,7 @@ typedef struct {
 } VGA_CHAR;
 
 void clear_screen(void);
+void vga_printf(char* fmt, ...);
 void vga_print(char* str);
 void vga_println(char* str);
 void vga_print_color(char* str, uint8_t color);

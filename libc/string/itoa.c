@@ -6,8 +6,9 @@ int digits(uint64_t val, int radix) {
     return out;
 }
 
-void itoa(uint64_t val, char* buf, int radix) {
+int itoa(uint64_t val, char* buf, int radix) {
     int i = digits(val, radix);
+    int out = i;
     buf[i] = '\0';
     do {
         int digit = (val % radix);
@@ -18,4 +19,5 @@ void itoa(uint64_t val, char* buf, int radix) {
         }
         buf[--i] = base + digit;
     } while ((val /= radix) > 0);
+    return out;
 }

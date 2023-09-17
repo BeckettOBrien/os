@@ -22,6 +22,15 @@ void double_fault_handler(interrupt_state state) {
     while (1) {}
 }
 
+void general_protection_fault_handler(interrupt_state state) {
+    vga_print("General Protection Fault detected at instruction 0x");
+    char addr[20];
+    itoa(state.ip, addr, 16);
+    vga_println(addr);
+    asm volatile("hlt");
+    while (1) {}
+}
+
 void page_fault_handler(interrupt_state state) {
     vga_println("Page Fault!");
     uint64_t addr;
@@ -46,5 +55,6 @@ void install_exception_handlers() {
     register_handler(0x0, (isr_t)division_overflow_handler);
     register_handler(0x3, (isr_t)breakpoint_handler);
     register_handler(0x8, (isr_t)double_fault_handler);
+    register_handler(0xD, (isr_t)general_protection_fault_handler);
     register_handler(0xE, (isr_t)page_fault_handler);
 }

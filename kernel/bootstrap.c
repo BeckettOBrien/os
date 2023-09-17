@@ -2,7 +2,9 @@
 #include "drivers/keyboard/ps2.h"
 #include "interrupts.h"
 #include "boot/multiboot.h"
-#include "memory/paging.h"
+#include "memory/kmalloc.h"
+#include "memory/memory.h"
+#include "string/string.h"
 
 void kernel_bootstrap(void) {
     clear_screen();
@@ -13,6 +15,11 @@ void kernel_bootstrap(void) {
     interrupt_test();
     initialize_keyboard();
     read_multiboot_info();
+    kmalloc_init();
+    vga_printf("printf tests below: %%%%%%\n");
+    char* buf = "Hello World!";
+    vga_printf("Decimal Test: %d, %i\nHex Test: 0x%x\nChar Test: %c\nString Test: %s\n",
+                54321, -123, 0xFEEDFACE, '*', buf);
     while (1) {}
 }
 
