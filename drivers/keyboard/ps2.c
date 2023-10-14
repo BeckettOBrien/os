@@ -1,4 +1,8 @@
 #include "ps2.h"
+#include "types.h"
+#include "bitmap.h"
+#include "keyboard.h"
+#include "key_defs.h"
 #include "cpu/pic.h"
 #include "cpu/isr.h"
 #include "drivers/io/ports.h"
@@ -12,31 +16,60 @@ void initialize_keyboard(void) {
     pic_unmask(PS2_IRQ_ID);
 }
 
-// TODO: Add support for shifted keys and modifier keys
-char key_table[0x3A] = {
-    0, 0, // null, escape
-    '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', '\b',
-    0, // tab
-    'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\n',
-    0, // lctrl
-    'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', '\'', '`',
-    0, // lshift
-    '\\', 'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/',
-    0, // rshift
-    '*',
-    0, // lalt
-    ' ',
-    0 // caps
+key key_table[0x58] = {
+   NULL, ESCAPE, ONE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, ZERO, MINUS, EQUALS, BACKSPACE,
+   TAB, Q, W, E, R, T, Y, U, I, O, P, LBRACKET, RBRACKET, ENTER,
+   LCTRL, A, S, D, F, G, H, J, K, L, SEMICOLON, SINGLEQUOTE, BACKTICK,
+   LSHFT, BACKSLASH, Z, X, C, V, B, N, M, COMMA, PERIOD, SLASH, RSHFT, STAR,
+   LALT, SPACE
 };
+
+char key_table_shifted[0x58] = {
+    0, 0, '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '+', 0,
+    0, 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', '{', '}', 0,
+    0, 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', ':', '"', '~',
+    0, '|', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', '<', '>', '?', 0, 0,
+    0, 0
+};
+
+uint8_t pressed_keys[BITMAP_SIZE(0x58)];
+uint8_t active_modifiers[BITMAP_SIZE(NUM_MODS)];
+
+void process_keydown(uint8_t keycode) {
+    bool repeated = BITMAP_GET(pressed_keys, keycode);
+    // Add key to held keys
+    BITMAP_SET(pressed_keys, keycode);
+    key pressed_key = key_table[keycode];
+    if (!repeated) {
+        handle_keydown_raw(pressed_key);
+    }
+    if (BITMAP_GET(pressed_keys, 0x2A) | BITMAP_GET(pressed_keys, 0x36)) {
+        if ((pressed_key.type == CHARACTER) && (key_table_shifted[keycode] != 0)) {
+            pressed_key.ascii = key_table_shifted[keycode];
+        }
+    }
+    if (pressed_key.type == MODIFIER) {
+        BITMAP_SET(active_modifiers, pressed_key.id);
+    }
+    handle_keypress_simple(pressed_key, active_modifiers);
+}
+
+void process_keyup(uint8_t keycode) {
+    // Remove key from held keys
+    BITMAP_CLEAR(pressed_keys, keycode);
+    key released_key = key_table[keycode];
+    handle_keyup_raw(released_key);
+    if (released_key.type == MODIFIER) {
+        BITMAP_CLEAR(active_modifiers, released_key.id);
+    }
+}
 
 // TODO: Add support for holding keys
 void ps2_interrupt_handler(interrupt_state state) {
-    // vga_println("KEY");
     uint8_t scancode = inb(PS2_IO_ADDR);
-    if (scancode > sizeof(key_table)) return;
-    char buf[2];
-    buf[0] = key_table[scancode];
-    if (buf[0] != 0) {
-        vga_print(buf);
+    if (scancode < 0x58) {
+        process_keydown(scancode);
+    } else if ((scancode > 0x80) && (scancode < 0x80 + 0x58)) {
+        process_keyup(scancode - 0x80);
     }
 }

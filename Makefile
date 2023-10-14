@@ -6,6 +6,7 @@ KERNEL_FILES := $(basename $(shell find . -type f -name '*.asm' | sed 's|^\./||'
 ASMFLAGS = -f elf64
 CFLAGS = -ffreestanding -Iinclude -Ilibc -I. -g -Wall -Wextra -MMD -MP
 LDFLAGS = -T linker.ld -nmagic
+QEMUFLAGS = -monitor stdio -m 128M
 KERNEL_IMAGE = build/kernel.bin
 DISK_IMAGE = build/disk.iso
 VM_DISK_PATH = vmdisk
@@ -34,10 +35,10 @@ $(DISK_IMAGE): $(KERNEL_IMAGE)
 build: $(DISK_IMAGE)
 
 run: $(DISK_IMAGE)
-	qemu-system-x86_64 -cdrom $(DISK_IMAGE) -monitor stdio
+	qemu-system-x86_64 -cdrom $(DISK_IMAGE) $(QEMUFLAGS)
 
 debug: $(DISK_IMAGE) $(KERNEL_IMAGE)
-	qemu-system-x86_64 -cdrom $(DISK_IMAGE) -monitor stdio -s -S
+	qemu-system-x86_64 -cdrom $(DISK_IMAGE) $(QEMUFLAGS) -s -S
 
 gdb: $(KERNEL_IMAGE)
 	gdb $(KERNEL_IMAGE) -ex 'target remote localhost:1234' -ex 'b kernel_bootstrap'

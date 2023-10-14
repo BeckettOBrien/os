@@ -65,23 +65,23 @@ void read_multiboot_info(void) {
 
 }
 
-void print_boot_info(void) {
-    vga_print("Booted by ");
-    vga_print(bootloader_name);
-    vga_print(" with args: ");
-    vga_println(boot_args);
-}
+// void print_boot_info(void) {
+//     vga_print("Booted by ");
+//     vga_print(bootloader_name);
+//     vga_print(" with args: ");
+//     vga_println(boot_args);
+// }
 
-void print_memory_region(uint64_t base_addr, uint64_t len) {
-    char start[20];
-    char end[20];
-    itoa(base_addr, start, 16);
-    itoa(base_addr + len, end, 16);
-    vga_print("0x");
-    vga_print(start);
-    vga_print("-0x");
-    vga_println(end);
-}
+// void print_memory_region(uint64_t base_addr, uint64_t len) {
+//     char start[20];
+//     char end[20];
+//     itoa(base_addr, start, 16);
+//     itoa(base_addr + len, end, 16);
+//     vga_print("0x");
+//     vga_print(start);
+//     vga_print("-0x");
+//     vga_println(end);
+// }
 
 extern uint64_t KERNEL_END;
 
@@ -95,8 +95,7 @@ void parse_memory_map(struct mb_memmap* memmap) {
     int num_reserved = 0;
     for (int i = 0; i < num_entries; i++) {
         if (memmap->entries[i].type == 1) {
-            vga_print("Found free memory region: ");
-            print_memory_region(memmap->entries[i].base_addr, memmap->entries[i].length);
+            // print_memory_region(memmap->entries[i].base_addr, memmap->entries[i].length);
             available_regions[num_available].base_addr = memmap->entries[i].base_addr;
             available_regions[num_available].len = memmap->entries[i].length;
             num_available++;
@@ -127,11 +126,6 @@ void parse_memory_map(struct mb_memmap* memmap) {
         // vga_print(" with reserved ");
         // vga_println(reserved);
     }
-    char kend[20];
-    itoa(&KERNEL_END, kend, 16);
-    vga_print("Kernel Ends: 0x");
-    vga_println(kend);
 
     init_heap(available_regions, 2, &KERNEL_END);
-    // Process regions
 }

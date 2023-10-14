@@ -1,0 +1,63 @@
+#pragma once
+#include "keyboard.h"
+
+#define NULL        { .type = CHARACTER, .ascii = 0 }
+#define ESCAPE      { .type = CHARACTER, .ascii = 0x1B }
+#define ONE         { .type = CHARACTER, .ascii = '1' }
+#define TWO         { .type = CHARACTER, .ascii = '2' }
+#define THREE       { .type = CHARACTER, .ascii = '3' }
+#define FOUR        { .type = CHARACTER, .ascii = '4' }
+#define FIVE        { .type = CHARACTER, .ascii = '5' }
+#define SIX         { .type = CHARACTER, .ascii = '6' }
+#define SEVEN       { .type = CHARACTER, .ascii = '7' }
+#define EIGHT       { .type = CHARACTER, .ascii = '8' }
+#define NINE        { .type = CHARACTER, .ascii = '9' }
+#define ZERO        { .type = CHARACTER, .ascii = '0' }
+#define MINUS       { .type = CHARACTER, .ascii = '-' }
+#define EQUALS      { .type = CHARACTER, .ascii = '=' }
+#define BACKSPACE   { .type = CHARACTER, .ascii = '\b' }
+#define TAB         { .type = CHARACTER, .ascii = '\t' }
+#define Q           { .type = CHARACTER, .ascii = 'q' }
+#define W           { .type = CHARACTER, .ascii = 'w' }
+#define E           { .type = CHARACTER, .ascii = 'e' }
+#define R           { .type = CHARACTER, .ascii = 'r' }
+#define T           { .type = CHARACTER, .ascii = 't' }
+#define Y           { .type = CHARACTER, .ascii = 'y' }
+#define U           { .type = CHARACTER, .ascii = 'u' }
+#define I           { .type = CHARACTER, .ascii = 'i' }
+#define O           { .type = CHARACTER, .ascii = 'o' }
+#define P           { .type = CHARACTER, .ascii = 'p' }
+#define LBRACKET    { .type = CHARACTER, .ascii = '[' }
+#define RBRACKET    { .type = CHARACTER, .ascii = ']' }
+#define ENTER       { .type = CHARACTER, .ascii = '\n' }
+#define LCTRL       { .type = MODIFIER, .id = L_CONTROL }
+#define A           { .type = CHARACTER, .ascii = 'a' }
+#define S           { .type = CHARACTER, .ascii = 's' }
+#define D           { .type = CHARACTER, .ascii = 'd' }
+#define F           { .type = CHARACTER, .ascii = 'f' }
+#define G           { .type = CHARACTER, .ascii = 'g' }
+#define H           { .type = CHARACTER, .ascii = 'h' }
+#define J           { .type = CHARACTER, .ascii = 'j' }
+#define K           { .type = CHARACTER, .ascii = 'k' }
+#define L           { .type = CHARACTER, .ascii = 'l' }
+#define SEMICOLON   { .type = CHARACTER, .ascii = ';' }
+#define SINGLEQUOTE { .type = CHARACTER, .ascii = '\'' }
+#define BACKTICK    { .type = CHARACTER, .ascii = '`' }
+#define LSHFT       { .type = MODIFIER, .id = L_SHIFT }
+#define BACKSLASH   { .type = CHARACTER, .ascii = '\\' }
+#define Z           { .type = CHARACTER, .ascii = 'z' }
+#define X           { .type = CHARACTER, .ascii = 'x' }
+#define C           { .type = CHARACTER, .ascii = 'c' }
+#define V           { .type = CHARACTER, .ascii = 'v' }
+#define B           { .type = CHARACTER, .ascii = 'b' }
+#define N           { .type = CHARACTER, .ascii = 'n' }
+#define M           { .type = CHARACTER, .ascii = 'm' }
+#define COMMA       { .type = CHARACTER, .ascii = ',' }
+#define PERIOD      { .type = CHARACTER, .ascii = '.' }
+#define SLASH       { .type = CHARACTER, .ascii = '/' }
+#define RSHFT       { .type = MODIFIER, .id = R_SHIFT }
+#define STAR        { .type = CHARACTER, .ascii = '*' }
+#define LALT        { .type = MODIFIER, .id = L_ALT }
+#define SPACE       { .type = CHARACTER, .ascii = ' ' }
+#define CAPS        { .type = MODIFIER, .id = CAPS }
+//TODO: F-keys and keypad

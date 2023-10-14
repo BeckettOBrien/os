@@ -43,10 +43,10 @@ void vga_print_color(char* str, uint8_t color) {
         if (c == '\n' || (VGA_CURSOR_X >= VGA_WIDTH)) {
             VGA_CURSOR_Y++;
             VGA_CURSOR_X = 0;
-            vga_scroll();
         }
         if (c == '\n') {
             i++;
+            vga_scroll();
             continue;
         }
         if (c == '\b') {
@@ -55,6 +55,11 @@ void vga_print_color(char* str, uint8_t color) {
                 VGA_CURSOR_X--;
                 vga_print_at(' ', color, VGA_CURSOR_X, VGA_CURSOR_Y);
             }
+            continue;
+        }
+        if (c == '\t') {
+            i++;
+            vga_print("    ");
             continue;
         }
         vga_scroll();

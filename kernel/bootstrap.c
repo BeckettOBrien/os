@@ -7,6 +7,8 @@
 #include "string/string.h"
 
 void kernel_bootstrap(void) {
+    read_multiboot_info();
+    kmalloc_init();
     clear_screen();
     vga_println("Hello World!");
     vga_test();
@@ -14,8 +16,6 @@ void kernel_bootstrap(void) {
     install_exception_handlers();
     interrupt_test();
     initialize_keyboard();
-    read_multiboot_info();
-    kmalloc_init();
     vga_printf("printf tests below: %%%%%%\n");
     char* buf = "Hello World!";
     vga_printf("Decimal Test: %d, %i\nHex Test: 0x%x\nChar Test: %c\nString Test: %s\n",

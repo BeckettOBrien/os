@@ -30,10 +30,10 @@ int kmalloc_init(void) {
 		vga_println("ERR: allocator_init: unable to allocate heap\n");
 		return -1;
 	}
-	char start[20];
-	itoa(kheap_start, start, 16);
-	vga_print("allocator_init: heap at ");
-	vga_println(start);
+	// char start[20];
+	// itoa(kheap_start, start, 16);
+	// vga_print("allocator_init: heap at ");
+	// vga_println(start);
 	end_chunk = (uint64_t)kheap_start + heap_length - sizeof(Chunk);
 	end_chunk->free = 0;
 	end_chunk->next = NULL;

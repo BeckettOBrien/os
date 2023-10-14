@@ -1,4 +1,5 @@
 #include "heap.h"
+#include "bitmap.h"
 #include "paging.h"
 #include "kmalloc.h"
 #include "memory/memory.h"
@@ -15,7 +16,7 @@
 #define MAX_HEAP_MEMORY 0x200 // Pages (MiB)
 
 // TODO: make this dynamic
-uint8_t free_memory[MAX_HEAP_MEMORY/8];
+uint8_t free_memory[BITMAP_SIZE(MAX_HEAP_MEMORY)];
 uint64_t heap_start;
 uint64_t current_mapped_heap_length;
 
@@ -45,7 +46,7 @@ void fill_bitmap(mem_region* memmap, int map_entries, uint64_t kernel_end) {
         for (int j = 0; j < BYTES_TO_PAGES(memmap[i].len); j++) {
             if ((base + PAGES_TO_BYTES(j)) < kernel_end) continue;
             if ((offset + j) >= MAX_HEAP_MEMORY) return;
-            free_memory[(offset + j)/8] |= (1 << (j%8));
+            BITMAP_SET(free_memory, offset + j);
         }
     }
 }
@@ -70,23 +71,23 @@ void print_heap_info(void) {
 uint64_t allocate_page(void) {
     int idx = 0;
     for (; idx < MAX_HEAP_MEMORY; idx++) {
-        if ((free_memory[idx/8] >> (idx%8)) & 1) break;
+        if (BITMAP_GET(free_memory, idx)) break;
     }
-    if (!((free_memory[idx/8] >> (idx%8)) & 1)) {
+    if (!BITMAP_GET(free_memory, idx)) {
         //TODO: Error propogation
         vga_println("ERR: No more physical heap memory!");
         panic();
     }
-    free_memory[idx/8] &= ~(1 << (idx%8));
+    BITMAP_CLEAR(free_memory, idx);
     return heap_start + PAGES_TO_BYTES(idx);
 }
 
 void free_page(uint64_t addr) {
-    int offset = BYTES_TO_PAGES(addr - heap_start);
-    if (free_memory[offset/8] &= (1 << (offset%8))) {
+    int idx = BYTES_TO_PAGES(addr - heap_start);
+    if (BITMAP_GET(free_memory, idx)) {
         vga_println("WARNING: double free detected!");
     }
-    free_memory[offset/8] |= (1 << (offset%8));
+    BITMAP_SET(free_memory, idx);
 }
 
 // Maps an additional page as part of the kernel heap

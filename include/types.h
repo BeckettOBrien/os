@@ -1,6 +1,9 @@
 #pragma once
 
 #define NULL 0
+#define bool _Bool
+#define true 1
+#define false 0
 
 typedef signed char int8_t;
 typedef short int16_t;
