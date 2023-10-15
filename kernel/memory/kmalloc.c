@@ -3,6 +3,7 @@
 #include "drivers/video/vga.h"
 #include "string/string.h"
 #include "math/math.h"
+#include "memory/memory.h"
 
 #define BYTES_TO_PAGES(x) (x >> 12)
 
@@ -98,6 +99,23 @@ void* kmalloc(uint64_t bytes) {
 			current_chunk = current_chunk->next;
 		}
 	}
+}
+
+void* realloc(void* ptr, uint64_t size) {
+	// TODO: resize existing chunk if possible
+	Chunk* current_chunk = kheap_start;
+	while ((current_chunk + sizeof(Chunk)) != ptr) {
+		if (current_chunk == NULL) {
+			vga_println("kfree: couldn't find target chunk");
+			return;
+		}
+		current_chunk = current_chunk->next;
+	}
+	void* newptr = kmalloc(size);
+	uint64_t old_size = current_chunk->next - (current_chunk + sizeof(Chunk));
+	memcpy(newptr, ptr, (size < old_size) ? size : old_size);
+	current_chunk->free = 1;
+	return newptr;
 }
 
 void kfree(void* ptr) {

@@ -9,7 +9,6 @@ This project is my attempt at making my own (very simple) operating system from 
 ### Current Features and To-Do List
 - [X] Booting from a multiboot-compliant bootloader
 - [X] Primitive VGA and PS/2 keyboard drivers
-  - The PS/2 driver does not currently support all keys or any modifiers
 - [X] Hardware and software interrupt handlers
 - [X] Allocating and mapping pages into kernel virtual memory
 - [X] Dynamic heap allocator

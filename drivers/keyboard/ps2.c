@@ -11,12 +11,14 @@
 #define PS2_IO_ADDR 0x60
 #define PS2_IRQ_ID 1
 
+//TODO: n-key rollover
+
 void initialize_keyboard(void) {
     register_handler(IRQ_IDX(PS2_IRQ_ID), (isr_t)ps2_interrupt_handler);
     pic_unmask(PS2_IRQ_ID);
 }
 
-key key_table[0x58] = {
+key_t key_table[0x58] = {
    NULL, ESCAPE, ONE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, ZERO, MINUS, EQUALS, BACKSPACE,
    TAB, Q, W, E, R, T, Y, U, I, O, P, LBRACKET, RBRACKET, ENTER,
    LCTRL, A, S, D, F, G, H, J, K, L, SEMICOLON, SINGLEQUOTE, BACKTICK,
@@ -39,7 +41,7 @@ void process_keydown(uint8_t keycode) {
     bool repeated = BITMAP_GET(pressed_keys, keycode);
     // Add key to held keys
     BITMAP_SET(pressed_keys, keycode);
-    key pressed_key = key_table[keycode];
+    key_t pressed_key = key_table[keycode];
     if (!repeated) {
         handle_keydown_raw(pressed_key);
     }
@@ -57,14 +59,13 @@ void process_keydown(uint8_t keycode) {
 void process_keyup(uint8_t keycode) {
     // Remove key from held keys
     BITMAP_CLEAR(pressed_keys, keycode);
-    key released_key = key_table[keycode];
+    key_t released_key = key_table[keycode];
     handle_keyup_raw(released_key);
     if (released_key.type == MODIFIER) {
         BITMAP_CLEAR(active_modifiers, released_key.id);
     }
 }
 
-// TODO: Add support for holding keys
 void ps2_interrupt_handler(interrupt_state state) {
     uint8_t scancode = inb(PS2_IO_ADDR);
     if (scancode < 0x58) {

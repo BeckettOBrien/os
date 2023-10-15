@@ -1,10 +1,30 @@
 #include "drivers/video/vga.h"
+#include "drivers/keyboard/keyboard.h"
 #include "drivers/keyboard/ps2.h"
 #include "interrupts.h"
 #include "boot/multiboot.h"
 #include "memory/kmalloc.h"
 #include "memory/memory.h"
 #include "string/string.h"
+#include "bitmap.h"
+
+void keypress_handler(key_t pressed_key, const uint8_t modifiers[]) {
+    if (pressed_key.type == CHARACTER) {
+        if (BITMAP_GET(modifiers, L_CONTROL) && (pressed_key.ascii == 'c')) {
+            vga_print("^C");
+            return;
+        }
+        vga_printf("%c", pressed_key.ascii);
+    }
+}
+
+void keydown(key_t key) {
+    vga_print("DOWN");
+}
+
+void keyup(key_t key) {
+    vga_print("UP");
+}
 
 void kernel_bootstrap(void) {
     read_multiboot_info();
@@ -20,6 +40,9 @@ void kernel_bootstrap(void) {
     char* buf = "Hello World!";
     vga_printf("Decimal Test: %d, %i\nHex Test: 0x%x\nChar Test: %c\nString Test: %s\n",
                 54321, -123, 0xFEEDFACE, '*', buf);
+    register_simple_keyboard_listener(keypress_handler);
+    register_raw_keydown_listener(keydown);
+    register_raw_keyup_listener(keyup);
     while (1) {}
 }
 
