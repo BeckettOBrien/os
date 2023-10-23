@@ -4,22 +4,29 @@
 enum KEY_TYPE {
     CHARACTER,
     MODIFIER,
-    MEDIA
+    OTHER // Media and function keys
 };
 
-enum KEY_IDS {
+enum MOD_IDS {
     L_SHIFT, R_SHIFT,
     L_CONTROL, R_CONTROL,
     L_ALT, R_ALT,
-    CAPS,
+    CAPS, NUMLOCK, SCRLLOCK,
     NUM_MODS
+};
+
+enum OTHER_IDS {
+    FN_1, FN_2, FN_3, FN_4, FN_5, FN_6, FN_7, FN_8, FN_9, FN_10, FN_11, FN_12,
+    PREV_TRACK, NEXT_TRACK, MEDIA_MUTE, MEDIA_CALCULATOR, MEDIA_PLAY, MEDIA_STOP,
+    VOLUME_DOWN, VOLUME_UP, WWW_HOME, HOME, ARROW_UP, PAGE_UP, ARROW_LEFT, ARROW_RIGHT, END, ARROW_DOWN, PAGE_DOWN,
+    INSERT, L_GUI, R_GUI
 };
 
 struct key {
     enum KEY_TYPE type;
     union {
         char ascii;
-        enum KEY_IDS id;
+        enum MOD_IDS id; // Also used for OTHER_IDS
     };
 };
 

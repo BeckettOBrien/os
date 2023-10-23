@@ -24,6 +24,6 @@ void isr_handle(interrupt_state state) {
 }
 
 void irq_handle(interrupt_state state) {
-    pic_eoi(state.id);
+    // pic_eoi(state.id); // Better to let each irq handle this on its own so each one can decide to be blocking/nonblocking
     isr_handle(state);
 }

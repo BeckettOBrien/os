@@ -15,15 +15,9 @@ void keypress_handler(key_t pressed_key, const uint8_t modifiers[]) {
             return;
         }
         vga_printf("%c", pressed_key.ascii);
+    } else if (pressed_key.type == OTHER) {
+        vga_printf("%d", pressed_key.id);
     }
-}
-
-void keydown(key_t key) {
-    vga_print("DOWN");
-}
-
-void keyup(key_t key) {
-    vga_print("UP");
 }
 
 void kernel_bootstrap(void) {
@@ -41,8 +35,6 @@ void kernel_bootstrap(void) {
     vga_printf("Decimal Test: %d, %i\nHex Test: 0x%x\nChar Test: %c\nString Test: %s\n",
                 54321, -123, 0xFEEDFACE, '*', buf);
     register_simple_keyboard_listener(keypress_handler);
-    register_raw_keydown_listener(keydown);
-    register_raw_keyup_listener(keyup);
     while (1) {}
 }
 
